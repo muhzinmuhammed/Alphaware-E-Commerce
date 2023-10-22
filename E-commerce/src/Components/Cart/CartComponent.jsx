@@ -46,35 +46,30 @@ function CardComponent() {
   };
 
   /* Remove Product From Cart*/
-  const handleRemove = (id) => {
-    // Show a SweetAlert confirmation dialog
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You are about to remove this product from your cart.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, remove it",
-    }).then((result) => {
+  const handleRemove = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: `Are you sure you want to remove the product ?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+      });
+
       if (result.isConfirmed) {
-        try {
-          const existingCartData = JSON.parse(
-            localStorage.getItem("cartDataProduct")
-          );
-          const newData = existingCartData.filter(
-            (item) => item?.product?._id !== id
-          );
-          localStorage.setItem("cartDataProduct", JSON.stringify(newData));
-          // Show toast message before reloading the page
-          toast.success("Product remove from cart");
-          // Reload the page
-          window.location.reload();
-        } catch (error) {
-          toast.error(error);
-        }
+        const updatedCount = 1;
+        localStorage.setItem(`product_${id}`, updatedCount.toString());
+
+        const existingCartData = JSON.parse(localStorage.getItem("cartDataProduct"));
+        const newData = existingCartData.filter((item) => {
+          return item?.product?._id !== id;
+        });
+        localStorage.setItem("cartDataProduct", JSON.stringify(newData));
+        window.location.reload();
       }
-    });
+    } catch (error) {
+      toast.error("Error");
+    }
   };
 
   /*grand Total */
@@ -82,6 +77,10 @@ function CardComponent() {
     return total + productCounts[product?.product?._id] * product?.product?.discountAmount;
   }, 0);
   /*grand Total */
+
+/* pagination*/  
+
+/* pagination*/  
 
   return (
     <Container className="cart-page">
@@ -147,7 +146,7 @@ function CardComponent() {
           </tbody>
           
         </Table>
-        <h1 className="float-end mt-5 ">Sub Total :{grandTotal} </h1>
+        <h1 className="float-end mt-5 ">Sub Total : ₹  {grandTotal} </h1>
         </>
         
       ) : (

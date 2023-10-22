@@ -4,7 +4,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Product.css";
-
+import {  Pagination } from "react-bootstrap";
 const ProductComponent = () => {
   const [products, setProducts] = useState([]); // Changed the variable name to 'products'.
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,81 +69,95 @@ const ProductComponent = () => {
           JSON.stringify(existingCartData)
         );
       } else {
-        toast.error("Product already exists in the cart");
+        const storedCount = localStorage.getItem(`product_${product._id}`);
+        const updatedCount = parseInt(storedCount, 10) + 1;
+        localStorage.setItem(`product_${product._id}`, updatedCount.toString());
+  
+        
+        toast.success("Existing product count incremented in the cart");
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
-
+  const showProducts = filteredProducts.length > 0;
   return (
     <>
       <ToastContainer />
-      <h1 className="text-center mt-3">Product List</h1> {/* Added a title. */}
-      <section className="py-4 container product-view">
-        <input
-          type="text"
-          placeholder="Search for a Products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="form-control"
-        />
-        <div className="row mt-5 justify-content-center">
-          {currenProduct.map((productItem) => (
-            <div
-              key={productItem._id}
-              className="col-11 col-md-6 col-lg-4 mx-0 mb-4"
-            >
-              <div className="card p-0 overflow-hidden h-100 shadow">
-                <img
-                  className="card-img-top img-fluid"
-                  src={productItem.imageUrl}
-                  alt="Card image cap"
-                />
-                <div className="card-body text-center">
-                  <h5 className="card-title">{productItem.description}</h5>
-                  <h6 className="text-center text-danger text-decoration-line-through ">
-                    Price: ₹ {productItem.price}
-                  </h6>
-                  <h2 className="text-center text-info">
-                    OFFER : ₹ {productItem.discountAmount}
-                  </h2>
+      <h1 className="text-center mt-3">Product List</h1>
 
-                  <button
-                    onClick={() => addToCart(productItem)}
-                    className="add-to-cart"
-                  >
-                    Add To Cart
-                  </button>
+      {showProducts && (
+        <section className="py-4 container product-view">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="form-control"
+          />
+          <div className="row mt-5 justify-content-center">
+            {currenProduct.map((productItem) => (
+              <div
+                key={productItem._id}
+                className="col-11 col-md-6 col-lg-4 mx-0 mb-4"
+              >
+                <div className="card p-0 overflow-hidden h-100 shadow">
+                  <img
+                    className="card-img-top img-fluid"
+                    src={productItem.imageUrl}
+                    alt="Card image cap"
+                  />
+                  <div className="card-body text-center">
+                    <h5 className="card-title">{productItem.description}</h5>
+                    <h6 className="text-center text-danger text-decoration-line-through">
+                      Price: ₹ {productItem.price}
+                    </h6>
+                    <h2 className="text-center text-info">
+                      OFFER : ₹ {productItem.discountAmount}
+                    </h2>
+
+                    <button
+                      onClick={() => addToCart(productItem)}
+                      className="add-to-cart"
+                    >
+                      Add To Cart
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <Pagination className="justify-content-center">
+            {currentPage > 1 && <Pagination.Prev onClick={handlePrevPage} />}
+            {Array.from({ length: totalPages }, (_, index) => (
+              <Pagination.Item
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                active={currentPage === index + 1}
+              >
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            {currentPage < totalPages && (
+              <Pagination.Next onClick={handleNextPage} />
+            )}
+          </Pagination>
+        </section>
+      )}
+      {!showProducts && (
+        <div className="text-center mt-5">
+          <h3>No products found for the search query {searchQuery}.</h3>
+
+          <button
+            onClick={() => (window.location.href = "/")}
+            className="btn btn-info text-white"
+          >
+            {" "}
+            Product Page
+          </button>
         </div>
-        <div className="pagination">
-          {currentPage > 1 && (
-            <button onClick={handlePrevPage} className="pagination-button">
-              Prev
-            </button>
-          )}
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`pagination-button ${
-                currentPage === index + 1 ? "active" : ""
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          {currentPage < totalPages && (
-            <button onClick={handleNextPage} className="pagination-button">
-              Next
-            </button>
-          )}
-        </div>
-      </section>
+      )}
     </>
   );
 };

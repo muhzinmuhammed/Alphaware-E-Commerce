@@ -12,7 +12,7 @@ function CardComponent() {
   ProductData.forEach((item) => {
     const id = item?.product?._id;
     const storedCount = localStorage.getItem(`product_${id}`);
-    initialProductCounts[id] = storedCount ? parseInt(storedCount, 10) : 0;
+    initialProductCounts[id] = storedCount ? parseInt(storedCount, 10) : 1;
   });
 
   const [productCounts, setProductCounts] = useState(initialProductCounts);
@@ -20,7 +20,7 @@ function CardComponent() {
   /* Decrease product  Qty*/
   const handleDecrement = (id) => {
     try {
-      if (productCounts[id] > 0) {
+        if (productCounts[id] > 1) {
         const updatedCounts = { ...productCounts };
         updatedCounts[id] = productCounts[id] - 1;
         setProductCounts(updatedCounts);
@@ -77,17 +77,26 @@ function CardComponent() {
     });
   };
 
+  /*grand Total */
+  const grandTotal = ProductData.reduce((total, product) => {
+    return total + productCounts[product?.product?._id] * product?.product?.discountAmount;
+  }, 0);
+  /*grand Total */
+
   return (
     <Container className="cart-page">
       <ToastContainer />
       {ProductData.length > 0 ? (
+        <>
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>#</th>
+              <th>No</th>
               <th>Product Image</th>
               <th>Product Price</th>
               <th>Qunatity</th>
+              <th>Total</th>
+
               <th>Action</th>
             </tr>
           </thead>
@@ -102,7 +111,7 @@ function CardComponent() {
                     alt="Product"
                   />
                 </td>
-                <td>{product?.product?.discountAmount}</td>
+                <td>₹ {product?.product?.discountAmount}</td>
                 <td>
                   <button
                     className="cart-button text-center btn btn-info text-white rounded"
@@ -120,6 +129,12 @@ function CardComponent() {
                   </button>
                 </td>
                 <td>
+                ₹  {productCounts[product?.product?._id] * product?.product?.discountAmount}
+
+
+                </td>
+
+                <td>
                   <button
                     className="btn btn-danger"
                     onClick={() => handleRemove(product?.product?._id)}
@@ -130,20 +145,26 @@ function CardComponent() {
               </tr>
             ))}
           </tbody>
+          
         </Table>
+        <h1 className="float-end mt-5 ">Sub Total :{grandTotal} </h1>
+        </>
+        
       ) : (
         <>
-          <Container className="ms-5">
-            <img src={cartEmpthy} />
-            <h1 className="  text-info">No Product In Cart </h1>
-            <button
-              href="/"
-              onClick={() => (window.location.href = "/")}
-              className=" btn btn-light text-info"
-            >
-              Continue Shopiing
-            </button>
-          </Container>
+         <Container className="ms-5">
+  <div className="text-center">
+    <img src={cartEmpthy} className="mx-auto" alt="Empty Cart" />
+    <h1 className="text-info"></h1>
+    <button
+      onClick={() => (window.location.href = "/")}
+      className="btn btn-lg bg-info text-white"
+    >
+      Continue Shopping
+    </button>
+  </div>
+</Container>
+
         </>
       )}
     </Container>

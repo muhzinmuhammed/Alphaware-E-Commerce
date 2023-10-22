@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 
-import Logo from '../assets/logo.png'
+import Logo from '../../assets/logo.png'
 
 function NavBarComponent() {
   return (
@@ -14,7 +14,7 @@ function NavBarComponent() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto ms-5">
             <Nav.Link className='ms-5' href="/ ">Product</Nav.Link>
-            <Nav.Link className='ms-5' href="">Cart</Nav.Link>
+            <Nav.Link className='ms-5' href="/cart">Cart</Nav.Link>
            
           </Nav>
         </Navbar.Collapse>

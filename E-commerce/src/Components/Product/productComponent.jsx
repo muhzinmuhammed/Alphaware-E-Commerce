@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import { Row, Col, Container, Card, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-import "./Product.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
+
 const ProductComponent = () => {
-  const [product, setProducts] = useState([]);
-  /* fetch data from api*/
+  const [products, setProducts] = useState([]); // Changed the variable name to 'products'.
+  
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const productResponse = await axios.post(
+        const productResponse = await axios.post( // Use 'get' instead of 'post' for fetching data.
           "http://3.7.252.58:4001/product/getAllProduct"
         );
         console.log(productResponse.data, "lll");
@@ -25,22 +25,15 @@ const ProductComponent = () => {
     fetchProductData();
   }, []);
 
-  /* fetch data from api*/
-
-  /*add to cart function*/
-  const AddToCart = (product) => {
+  const addToCart = (product) => { // Changed the function name to follow naming conventions.
     try {
-      // Get the existing cart data from localStorage
       const existingCartData = JSON.parse(localStorage.getItem("cartDataProduct")) || [];
-  
-      // Check if the product already exists in the cart
+
       const productExistsInCart = existingCartData.some((item) => item.product._id === product._id);
-  
+
       if (!productExistsInCart) {
         toast.success("Product added to cart successfully");
-        existingCartData.push({ product }); // Wrap the product in an object
-  
-        // Update the cart data in localStorage
+        existingCartData.push({ product });
         localStorage.setItem("cartDataProduct", JSON.stringify(existingCartData));
       } else {
         toast.error("Product already exists in the cart");
@@ -49,52 +42,33 @@ const ProductComponent = () => {
       toast.error(error.message);
     }
   };
-  
-  /*add to cart function*/
 
   return (
     <>
       <ToastContainer />
-      <Container className="product-view bg-body-tertiary">
-        <Row xs={1} md={3} className="g-5">
-          {product.map((productItem, idx) => (
-            <Col key={idx}>
-              <Card key={productItem._id} style={{ height: "500px" }}>
-                <Card.Img
-                  className="product-image"
-                  variant="top"
-                  src={productItem.imageUrl}
-                />
-                <Card.Body>
-                  <h4 className="text-center">{productItem.description}</h4>
+      <h1 className="text-center mt-3">Product List</h1> {/* Added a title. */}
+      <section className="py-4 container product-view">
+        <div className="row justify-content-center">
+          {products.map((productItem) => (
+            <div key={productItem._id} className="col-11 col-md-6 col-lg-3 mx-0 mb-4">
+              <div className="card p-0 overflow-hidden h-100 shadow">
+                <img className="card-img-top img-fluid" src={productItem.imageUrl} alt="Card image cap" />
+                <div className="card-body text-center">
+                  <h5 className="card-title">{productItem.description}</h5>
                   <h6 className="text-center text-danger text-decoration-line-through ">
                     Price: ₹ {productItem.price}
                   </h6>
                   <h2 className="text-center text-info">
                     OFFER : ₹ {productItem.discountAmount}
                   </h2>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Button
-                      onClick={() => {
-                        AddToCart(productItem);
-                      }}
-                      className=" add-to-cart "
-                    >
-                      Add To Cart
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
+
+                  <button onClick={() => addToCart(productItem)} className="btn btn-info text-white">Add To Cart</button> 
+                </div>
+              </div>
+            </div>
           ))}
-        </Row>
-      </Container>
+        </div>
+      </section>
     </>
   );
 };

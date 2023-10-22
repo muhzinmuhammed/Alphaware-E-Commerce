@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NavBarComponent from '../Components/NavBarCompont'
+import NavBarComponent from '../Components/NavBar/NavBarCompont'
 import ProductComponent from '../Components/Product/productComponent';
 
 const ProductPage = () => {
